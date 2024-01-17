@@ -1,0 +1,83 @@
+import pygame
+import sys
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Set up some constants
+WIDTH, HEIGHT = 640, 480
+SPEED = 2
+ITEM_SIZE = 20
+ITEMS_COUNT = 10
+
+# Set up the display
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Set up the player
+player = pygame.Rect(WIDTH / 2, HEIGHT / 2, 50, 50)
+
+# Set up the score
+score = 0
+
+# Set up the font
+font = pygame.font.Font(None, 36)
+
+# Set up the items
+items = [pygame.Rect(random.randint(0, WIDTH - ITEM_SIZE), random.randint(0, HEIGHT - ITEM_SIZE), ITEM_SIZE, ITEM_SIZE) for _ in range(ITEMS_COUNT)]
+
+# Run until the user asks to quit
+running = True
+while running:
+    # Fill the background with white
+    screen.fill((255, 255, 255))
+
+    # Draw the player
+    pygame.draw.rect(screen, (0, 0, 255), player)
+
+    # Draw the items
+    for item in items:
+        pygame.draw.rect(screen, (255, 0, 0), item)
+
+    # Move the player
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player.x -= SPEED
+    if keys[pygame.K_RIGHT]:
+        player.x += SPEED
+    if keys[pygame.K_UP]:
+        player.y -= SPEED
+    if keys[pygame.K_DOWN]:
+        player.y += SPEED
+
+    # Make sure the player stays on the screen
+    if player.x < 0:
+        player.x = 0
+    if player.x > WIDTH - player.width:
+        player.x = WIDTH - player.width
+    if player.y < 0:
+        player.y = 0
+    if player.y > HEIGHT - player.height:
+        player.y = HEIGHT - player.height
+
+    # Check for item collection
+    for item in items:
+        if player.colliderect(item):
+            items.remove(item)
+            score += 1
+
+    # Draw the score
+    score_text = font.render("Score: {}".format(score), True, (0, 0, 0))
+    screen.blit(score_text, (10, 10))
+
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Flip the display
+    pygame.display.flip()
+
+# Done! Time to quit.
+pygame.quit()
+sys.exit()
